@@ -19,10 +19,16 @@ change state.
 1. Read the plan file you are given (normally `.triad/plan.md`): Goal, Steps, Acceptance
    criteria, Out of scope.
 2. Get the change. If `.triad/base` exists, its first line is `base: <commit>` and the
-   remaining lines list files that were already untracked before the task started:
+   remaining lines are `<blob>\t<path>` for files that were already untracked before the
+   task started (older baselines list only `<path>`):
    - `git diff <commit>` is the full change for this task (staged and unstaged).
    - New files are those from `git ls-files --others --exclude-standard` that are not
      listed in `.triad/base`. Read them in full.
+   - A listed file whose `git hash-object -- <path>` no longer matches its blob was
+     changed by the task. Review only that change:
+     `git cat-file -p <blob> | diff -u - <path>`. A listed file that no longer exists was
+     deleted by the task; check that the plan called for it. Lines without a blob cannot
+     be checked this way; say so under Notes if any exist.
    - Changes the user had before the task are in the baseline, so do not review them.
 
    Without `.triad/base`, use `git diff HEAD` plus untracked files from

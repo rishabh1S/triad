@@ -31,7 +31,11 @@ for a subagent's result before starting the next phase.
    it does not touch the working tree or the stash list):
    ```bash
    base=$(git stash create); base=${base:-$(git rev-parse HEAD)}
-   { echo "base: $base"; git ls-files --others --exclude-standard; } > .triad/base
+   { echo "base: $base"
+     git ls-files --others --exclude-standard | while IFS= read -r f; do
+       printf '%s\t%s\n' "$(git hash-object -w -- "$f")" "$f"
+     done
+   } > .triad/base
    ```
    Then delegate to `triad:implementer`: plan path `.triad/plan.md`, all unchecked steps.
 6. Save its report to `.triad/build-report.md`. If any step is BLOCKED, show the blocker
