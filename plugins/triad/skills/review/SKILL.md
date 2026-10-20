@@ -19,7 +19,9 @@ Extra focus from the user: $ARGUMENTS
 4. Show the user the verdict and the findings list, ordered Blocker → Major → Minor.
 5. If the verdict is CHANGES_REQUESTED, suggest `/triad:build fix` to have the implementer
    address the Blocker and Major findings. Do not fix anything yourself here.
-6. If the verdict is PASS, read `.triad/commit-mode` (missing means `manual`).
+6. If the verdict is PASS, read `.triad/commit-mode`. It is `auto` or `off` only when
+   the file holds exactly that word; anything else, including a missing or empty file,
+   means `manual`.
    - `off`: tell the user nothing has been committed and that `/triad:commit` commits
      the task whenever they want.
    - `manual` or `auto`: stop here and offer the commit. Read

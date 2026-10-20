@@ -8,8 +8,9 @@ disable-model-invocation: true
 
 Argument from the user: $ARGUMENTS
 
-The commit mode lives in `.triad/commit-mode` (one word: `manual`, `auto` or `off`). If
-the file is missing, the mode is `manual`.
+The commit mode lives in `.triad/commit-mode` (one word: `manual`, `auto` or `off`). The
+mode is `auto` or `off` only when the file holds exactly that word; anything else,
+including a missing or empty file, means `manual`.
 
 - `manual`: after a PASS, ask the user for the commit message.
 - `auto`: after a PASS, draft the message from the changes and wait for the user's yes.

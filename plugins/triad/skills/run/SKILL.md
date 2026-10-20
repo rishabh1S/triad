@@ -52,7 +52,9 @@ for a subagent's result before starting the next phase.
 ## Finish
 12. Give the user a short summary: what was built, files changed, the final verdict, any
     remaining Minor findings, and the checks that ran.
-13. If the final verdict is PASS, read `.triad/commit-mode` (missing means `manual`).
+13. If the final verdict is PASS, read `.triad/commit-mode`. It is `auto` or `off` only
+    when the file holds exactly that word; anything else, including a missing or empty
+    file, means `manual`.
     - `off`: remind the user nothing has been committed and that `/triad:commit`
       commits the task whenever they want.
     - `manual` or `auto`: stop here and offer the commit. Read

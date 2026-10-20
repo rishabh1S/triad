@@ -1,140 +1,172 @@
 # triad
 
-A Planner → Implementer → Reviewer workflow for [Claude Code](https://code.claude.com/docs/en/overview), packaged as a plugin.
+**Plan it, build it, check it, commit it, with three focused AI agents instead of one.**
 
-Instead of one long session that plans, codes and then grades its own work, triad gives each job to a separate subagent with its own context window, its own tools and its own instructions. Your main session becomes the orchestrator.
+triad is a [Claude Code](https://code.claude.com/docs/en/overview) plugin. It splits every coding task between three agents: a **Planner**, an **Implementer** and a **Reviewer**. Your main Claude session coordinates them, and you approve the key decisions.
 
 ```
-           /triad:plan                 /triad:build                 /triad:review
- task ──► ┌──────────┐   you approve  ┌─────────────┐              ┌──────────┐
-          │ Planner  │ ─────────────► │ Implementer │ ───────────► │ Reviewer │ ──► PASS ──► commit?
-          │ read-only│  .triad/plan.md│ edits + runs│   git diff   │ read-only│     (you confirm)
-          └──────────┘                └─────────────┘              └──────────┘
-                                             ▲    CHANGES_REQUESTED     │
-                                             └──── /triad:build fix ◄───┘
+ your task
+     │
+     ▼
+┌──────────┐  you approve  ┌─────────────┐             ┌──────────┐
+│ Planner  │ ────────────► │ Implementer │ ──────────► │ Reviewer │ ──► PASS ──► commit?
+│ read-only│   the plan    │ writes code │  the diff   │ read-only│     (you confirm)
+└──────────┘               └─────────────┘             └──────────┘
+                                  ▲   changes requested    │
+                                  └────────────────────────┘
 ```
 
-| Agent | Tools | Job |
-|---|---|---|
-| `planner` | Read, Grep, Glob, Bash (inspect only), web | Explores the code, writes a step-by-step plan with verification per step. Cannot edit files. |
-| `implementer` | Read, Edit, Write, Bash | Executes approved steps exactly, runs each step's check, ticks it off. Stops instead of improvising when the plan is wrong. |
-| `reviewer` | Read, Grep, Glob, Bash (inspect + tests) | Sees only the plan and the diff, never the implementer's reasoning. Returns PASS or CHANGES_REQUESTED with `file:line` findings. |
+## Why use it
 
-## Install
+When one AI session plans, writes and then checks its own code, it tends to agree with itself. triad separates those jobs:
 
-### As a plugin (recommended)
+- **A plan you can check first.** The Planner explores your code and writes a step-by-step plan, but it can't edit anything. You read the plan and approve it before any code is written, which is the cheapest time to catch a wrong approach.
+- **Code that follows the plan.** The Implementer carries out the approved steps one by one and runs each step's check. If the plan turns out to be wrong, it stops and tells you instead of improvising.
+- **An honest second opinion.** The Reviewer sees only the plan and the code changes. It never sees the Implementer's reasoning, so it judges the result, not the excuses. It replies **PASS** or **CHANGES_REQUESTED**, with each finding pointing to a file and line.
+- **A clean commit at the end.** When the review passes, triad offers to commit just that task's files, using either your commit message or one it drafts for you.
 
-Push this repo to GitHub, then anyone can run these inside Claude Code:
+Each agent runs in its own context window with only the tools it needs, so your main session stays uncluttered.
+
+## Setup
+
+You need [Claude Code](https://code.claude.com/docs/en/overview) installed. Your project should be a git repository for change tracking, scoped reviews and commits to work.
+
+### Option 1: Install as a plugin (recommended)
+
+Inside Claude Code, run:
 
 ```
 /plugin marketplace add rishabh1S/triad
 /plugin install triad@triad-agents
 ```
 
-Or from a shell:
+Or run the same thing from your terminal:
 
 ```bash
 claude plugin marketplace add rishabh1S/triad
 claude plugin install triad@triad-agents
 ```
 
-To try it locally before pushing:
+That's it. The commands are now available in every project as `/triad:plan`, `/triad:run` and so on.
 
-```bash
-claude plugin marketplace add ./triad
-claude plugin install triad@triad-agents
+To get updates later:
+
+```
+/plugin marketplace update triad-agents
+/reload-plugins
 ```
 
-### Copied into one project (no plugin system)
+### Option 2: Copy it into one project
 
-Useful when you want the agents checked into a repo so the whole team gets them:
+Use this to check the agents into a repository so everyone on the team gets them without installing a plugin:
 
 ```bash
 git clone https://github.com/rishabh1S/triad.git
-./triad/install.sh /path/to/your/project     # or: ./triad/install.sh --user
+./triad/install.sh /path/to/your/project     # into one project's .claude/ folder
+./triad/install.sh --user                    # or for your user account, in every project
 ```
 
-Local installs drop the plugin namespace, so commands become `/triad-plan`, `/triad-build`, `/triad-review`, `/triad-run`. Remove with `./triad/install.sh --uninstall /path/to/your/project`.
+Copied installs use a dash instead of a colon: `/triad-plan`, `/triad-build`, `/triad-review`, `/triad-run` and `/triad-commit`.
 
-## Use
+To remove it: `./triad/install.sh --uninstall /path/to/your/project`
 
-| Command | What it does |
-|---|---|
-| `/triad:plan <task>` | Planner writes `.triad/plan.md`, you get a summary and approve or edit it. |
-| `/triad:build [steps]` | Implementer runs all unchecked steps, or only the numbers you pass. |
-| `/triad:review [focus]` | Reviewer checks the diff against the plan. Optional focus, e.g. `security`. |
-| `/triad:build fix` | Implementer fixes the Blocker and Major findings from the last review. |
-| `/triad:run <task>` | The whole loop: plan → your approval → build → review → up to 2 fix rounds → commit offer. |
-| `/triad:commit [message]` | Commit the current task now, optionally with your own message. |
-| `/triad:commit manual\|auto\|off` | Choose what happens after a PASS (see below). |
+## How to use it
 
-Example:
+### The quick way: one command
 
 ```
 /triad:run add rate limiting to the /api/orders endpoint using the existing Redis client
 ```
 
-Everything the agents produce lands in `.triad/` in your project:
+This is what happens:
+
+1. **Plan.** The Planner explores your code and writes a plan. You see the goal, the steps and the main risks.
+2. **You approve.** Reply to go ahead, ask for changes, or edit `.triad/plan.md` yourself. Nothing is built until you say so.
+3. **Build.** The Implementer carries out the steps and checks each one.
+4. **Review.** The Reviewer checks the changes against the plan.
+5. **Fix.** If the Reviewer requests changes, the Implementer fixes them and the code is reviewed again. This happens at most twice; after that triad stops and shows you the remaining findings, because the plan itself may need rethinking.
+6. **Commit.** On a PASS, triad stops and offers to commit (see [Committing](#committing)).
+
+### Step by step
+
+For more control, run each stage yourself:
+
+| Command | What it does |
+|---|---|
+| `/triad:plan <task>` | Writes a plan for you to approve or edit. |
+| `/triad:build` | Builds every step not yet done. Pass step numbers to build only those, e.g. `/triad:build 1 2`. |
+| `/triad:review` | Reviews the changes against the plan. Add a focus if you like, e.g. `/triad:review security`. |
+| `/triad:build fix` | Fixes the serious findings (Blocker and Major) from the last review. |
+| `/triad:commit` | Commits the current task now. Add a message to use it directly: `/triad:commit Add order rate limiting`. |
+| `/triad:commit manual\|auto\|off` | Chooses what happens after a review passes. |
+
+A typical manual flow: `/triad:plan …` → read and approve → `/triad:build` → `/triad:review` → `/triad:build fix` if needed → `/triad:review` again → commit.
+
+Tip: you don't have to use every stage. Running only `/triad:review` after your normal workflow gives you most of the benefit of an independent review.
+
+## Committing
+
+When a review passes, triad pauses and offers to commit the task. Nothing is committed until you say yes.
+
+Choose how it works with one command. The setting is saved per project and kept between tasks.
+
+| Mode | Command | After a PASS |
+|---|---|---|
+| **Manual** (default) | `/triad:commit manual` | Shows the changed files and asks you for the commit message. |
+| **Auto** | `/triad:commit auto` | Drafts a message from the changes and the plan, then waits for you to accept it, edit it or cancel. |
+| **Off** | `/triad:commit off` | Doesn't offer. Run `/triad:commit` yourself whenever you're ready. |
+
+You don't need to set anything up: a fresh install uses **manual**.
+
+triad is careful about what goes into the commit:
+
+- **Only this task's files.** Before building, triad notes which changes you already had, and leaves those out of the commit.
+- **Your staged work stays put.** Anything else you had staged stays staged and is not included.
+- **A warning when files overlap.** If a file had your own uncommitted edits before the task and triad also changed it, you're told that the whole file will be committed.
+- **No shortcuts.** Git hooks always run, nothing is amended, and nothing is ever pushed.
+
+## Where things are saved
+
+Everything the agents produce goes into a `.triad/` folder in your project:
 
 ```
 .triad/
-├── .gitignore         # contains `*`, so git ignores the whole folder
-├── plan.md            # the plan, with steps ticked off as they pass
-├── base               # git baseline recorded before the first build
-├── build-report.md    # what the implementer did and what it verified
+├── plan.md            # the plan; steps are ticked off as they're done
+├── build-report.md    # what the Implementer did and checked
 ├── review.md          # the latest review
-├── committed          # SHA of the task's commit, once made
-├── commit-mode        # manual, auto or off (kept across tasks)
-└── archive/           # one folder per previous task
+├── base               # a snapshot reference taken before building
+├── committed          # the commit ID, once the task is committed
+├── commit-mode        # your commit setting (manual, auto or off)
+└── archive/           # earlier tasks, one folder each
 ```
 
-`.triad/` ignores itself, so it never shows up in `git status` or in commits. Delete `.triad/.gitignore` if you want to commit these files.
+- **Hidden from git.** The folder has its own `.gitignore`, so it never shows up in `git status` or in commits. Delete `.triad/.gitignore` if you want to keep these files in your repository.
+- **Your earlier changes are left alone.** The snapshot in `base` is taken with `git stash create`, which doesn't touch your files or your stash list. The Reviewer only looks at changes made after it, so work you already had in progress isn't reviewed or committed.
+- **Old tasks are archived.** Starting a new plan moves the previous task's files into `archive/`.
 
-### Committing
+## Customizing
 
-When a review passes, triad stops and offers to commit the task. Pick how with `/triad:commit <mode>`:
+- **Models.** The Implementer uses `sonnet` to keep costs down. The Planner and Reviewer use the same model as your session. To change this, edit the `model:` line in `plugins/triad/agents/*.md`; accepted values are `sonnet`, `opus`, `haiku`, `fable`, `inherit` or a full model ID.
+- **Your conventions.** Add your team's rules to the agent prompts. For example, add "Every new endpoint needs an integration test" to `reviewer.md`.
+- **Project rules.** All three agents read your project's `CLAUDE.md`, so rules you put there apply to them automatically.
 
-| Mode | After a PASS |
-|---|---|
-| `manual` (default) | Shows the files and asks you for the commit message. |
-| `auto` | Drafts the message from the diff and the plan, then waits for your yes, an edit, or cancel. |
-| `off` | Doesn't offer; run `/triad:commit` yourself whenever you like. |
+If you installed from a local folder, run `/reload-plugins` after editing.
 
-Only the task's own files are committed: triad uses the baseline to leave out changes you had before the task, and commits by path so anything else you had staged stays staged. It warns you when a task file also had your earlier uncommitted edits. Nothing is committed without your yes, hooks are never skipped, and nothing is ever pushed.
+## Good to know
 
-Before the first build, triad records a baseline using `git stash create`, which does not change your working tree or stash list. The reviewer only judges changes made since then, so uncommitted work you already had is left out of the review. Starting a new plan moves all of the previous task's files into `archive/`.
+- **It costs more tokens than a single session.** Each agent starts fresh and re-reads the files it needs, so save `/triad:run` for real features and risky changes, not one-line fixes.
+- **The plan is the handoff.** Agents pass work to each other through files, so anything the Planner didn't write down is lost. A clear task description gives you a better plan.
+- **It never starts on its own.** triad only runs when you type one of its commands.
 
-## Why it is built this way
-
-- **The reviewer gets no context from the author.** It reads the plan and the diff, not the implementer's report or earlier reviews. A reviewer that knows why each line was written tends to agree with it.
-- **Planner and reviewer can't edit files.** Tool restrictions keep the planner from sliding into coding and the reviewer from quietly "fixing" what it should report.
-- **You approve the plan.** The cheapest place to catch a wrong design is before any code exists.
-- **The fix loop is capped at 2 rounds.** If review keeps failing, the plan is usually the problem, and a human should look.
-- **Commands only run when you call them** (`disable-model-invocation: true`), so the workflow never starts on its own.
-
-## Customize
-
-- **Models**: the implementer runs on `sonnet` to save cost; planner and reviewer inherit your session's model. Change the `model:` line in `plugins/triad/agents/*.md` (`sonnet`, `opus`, `haiku`, `fable`, `inherit`, or a full model ID).
-- **Your stack**: add your conventions to the agent prompts, e.g. "Spring Boot services use constructor injection; every new endpoint needs a MockMvc test" in `reviewer.md`.
-- **Project rules**: agents load your project's `CLAUDE.md`, so repo-wide rules there apply to all three.
-
-After editing a plugin installed from a local folder, run `/reload-plugins` in your session.
-
-## Costs and limits
-
-- Each subagent starts cold and re-reads files, so one `/triad:run` costs several times more tokens than doing the change directly. Use it for real features and risky changes, not one-line fixes.
-- Handoffs go through files and summaries. Anything the planner knew but didn't write down is lost, so a good plan matters.
-- Start small: running only `/triad:review` after your normal workflow gets most of the value of independent review.
-
-## Layout
+## Project layout
 
 ```
-.claude-plugin/marketplace.json     # marketplace catalog (lets people install from this repo)
+.claude-plugin/marketplace.json     # makes this repo installable as a marketplace
 plugins/triad/
 ├── .claude-plugin/plugin.json      # plugin manifest
 ├── agents/                         # planner.md, implementer.md, reviewer.md
-└── skills/                         # plan/, build/, review/, run/, commit/  → /triad:<name>
-install.sh                          # copy into a project's .claude/ without the plugin system
+└── skills/                         # plan, build, review, run, commit → /triad:<name>
+install.sh                          # copies triad into a project without the plugin system
 ```
 
 ## License
