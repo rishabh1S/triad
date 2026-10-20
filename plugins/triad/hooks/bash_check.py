@@ -18,6 +18,13 @@ WRITE_COMMANDS = {
 WRAPPERS = {"env", "command", "builtin", "exec", "nohup", "nice", "time", "timeout"}
 KEYWORDS = {"do", "then", "else", "elif", "if", "while", "until", "!", "{", "}"}
 XARGS_FLAGS_WITH_VALUE = {"-n", "-I", "-L", "-P", "-d", "-s", "-E", "-a"}
+WRAPPER_FLAGS_WITH_VALUE = {
+    "env": {"-u", "--unset", "-C", "--chdir"},
+    "exec": {"-a"},
+    "nice": {"-n", "--adjustment"},
+    "timeout": {"-s", "--signal", "-k", "--kill-after"},
+}
+ENV_SPLIT_FLAGS = {"-S", "--split-string"}
 SHELLS = {"bash", "sh", "zsh", "dash", "ksh"}
 SAFE_REDIRECT_TARGETS = {"/dev/null", "/dev/stdout", "/dev/stderr"}
 ASSIGNMENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
@@ -130,8 +137,12 @@ def _command_word(tokens):
             i += 1
         elif name in WRAPPERS:
             i += 1
+            with_value = WRAPPER_FLAGS_WITH_VALUE.get(name, set())
             while i < len(tokens) and tokens[i].startswith("-"):
-                i += 1
+                if name == "env" and tokens[i] in ENV_SPLIT_FLAGS:
+                    # `env -S "rm x"` runs its value as a command line, like eval.
+                    return "eval", tokens[i + 1:]
+                i += 2 if tokens[i] in with_value else 1
             if name == "timeout" and i < len(tokens):
                 i += 1
         elif name == "xargs":
