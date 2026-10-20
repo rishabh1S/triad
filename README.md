@@ -76,17 +76,21 @@ Everything the agents produce lands in `.triad/` in your project:
 
 ```
 .triad/
+├── .gitignore         # contains `*`, so git ignores the whole folder
 ├── plan.md            # the plan, with steps ticked off as they pass
+├── base               # git baseline recorded before the first build
 ├── build-report.md    # what the implementer did and what it verified
 ├── review.md          # the latest review
-└── archive/           # previous plans
+└── archive/           # one folder per previous task
 ```
 
-Add `.triad/` to `.gitignore` if you don't want these committed. Nothing is ever committed or pushed for you.
+`.triad/` ignores itself, so it never shows up in `git status` or in commits. Delete `.triad/.gitignore` if you want to commit these files. Nothing is ever committed or pushed for you.
+
+Before the first build, triad records a baseline using `git stash create`, which does not change your working tree or stash list. The reviewer only judges changes made since then, so uncommitted work you already had is left out of the review. Starting a new plan moves all of the previous task's files into `archive/`.
 
 ## Why it is built this way
 
-- **The reviewer gets no context from the author.** It reads the plan and the diff, not the implementer's report. A reviewer that knows why each line was written tends to agree with it.
+- **The reviewer gets no context from the author.** It reads the plan and the diff, not the implementer's report or earlier reviews. A reviewer that knows why each line was written tends to agree with it.
 - **Planner and reviewer can't edit files.** Tool restrictions keep the planner from sliding into coding and the reviewer from quietly "fixing" what it should report.
 - **You approve the plan.** The cheapest place to catch a wrong design is before any code exists.
 - **The fix loop is capped at 2 rounds.** If review keeps failing, the plan is usually the problem, and a human should look.

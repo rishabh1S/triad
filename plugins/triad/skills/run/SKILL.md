@@ -16,15 +16,24 @@ for a subagent's result before starting the next phase.
 
 ## Phase 1 — Plan
 1. Delegate the task to `triad:planner`, with any relevant context from this conversation.
-2. Create `.triad/` if needed. Archive an existing `.triad/plan.md` to
-   `.triad/archive/plan-<YYYYMMDD-HHMMSS>.md`, then save the new plan to `.triad/plan.md`.
+2. Create `.triad/` if needed, with a `.triad/.gitignore` containing `*` if it is missing.
+   If `.triad/plan.md` exists, move `plan.md`, `build-report.md`, `review.md` and `base`
+   (whichever exist) into `.triad/archive/<YYYYMMDD-HHMMSS>/`. Save the new plan to
+   `.triad/plan.md`.
 3. Show the user the goal, step titles and top risks.
 4. **Stop and wait for approval.** Continue only on an explicit go-ahead. If the user asks
    for changes, send the plan and their feedback back to `triad:planner`, save the
    revision, and ask again. If they edited `.triad/plan.md` themselves, re-read it.
 
 ## Phase 2 — Implement
-5. Delegate to `triad:implementer`: plan path `.triad/plan.md`, all unchecked steps.
+5. If `.triad/base` does not exist and the project is a git repo with at least one
+   commit, record the baseline from the project root (this only writes a commit object;
+   it does not touch the working tree or the stash list):
+   ```bash
+   base=$(git stash create); base=${base:-$(git rev-parse HEAD)}
+   { echo "base: $base"; git ls-files --others --exclude-standard; } > .triad/base
+   ```
+   Then delegate to `triad:implementer`: plan path `.triad/plan.md`, all unchecked steps.
 6. Save its report to `.triad/build-report.md`. If any step is BLOCKED, show the blocker
    and stop for the user's decision.
 

@@ -1,6 +1,6 @@
 ---
 description: Implement the approved plan in .triad/plan.md with the triad implementer agent. Usage /triad:build [step numbers, default all remaining]
-argument-hint: [step numbers, e.g. "1 2" — default: all remaining]
+argument-hint: '[step numbers, e.g. "1 2" — default: all remaining]'
 disable-model-invocation: true
 ---
 
@@ -17,12 +17,21 @@ latest review)
    - step numbers: run those steps.
    - empty: run every step still marked `- [ ]`. If none remain, say so and suggest
      `/triad:review`.
-3. Delegate to the `triad:implementer` subagent with: the plan path `.triad/plan.md`, the
+3. If `.triad/base` does not exist and the project is a git repo with at least one commit,
+   record the baseline so the review covers only this task's changes. Run from the project
+   root:
+   ```bash
+   base=$(git stash create); base=${base:-$(git rev-parse HEAD)}
+   { echo "base: $base"; git ls-files --others --exclude-standard; } > .triad/base
+   ```
+   `git stash create` only writes a commit object; it does not touch the working tree or
+   the stash list. Never overwrite an existing `.triad/base`.
+4. Delegate to the `triad:implementer` subagent with: the plan path `.triad/plan.md`, the
    exact step numbers or the exact findings to fix (copied verbatim), and any user
    instructions from this conversation since the plan was approved. Wait for its report
    before continuing.
-4. Save the report to `.triad/build-report.md` (overwrite).
-5. Relay to the user, briefly: which steps are done, files changed, verification results.
-6. If any step is BLOCKED, show the blocker and stop. Do not try to fix it yourself and do
+5. Save the report to `.triad/build-report.md` (overwrite).
+6. Relay to the user, briefly: which steps are done, files changed, verification results.
+7. If any step is BLOCKED, show the blocker and stop. Do not try to fix it yourself and do
    not re-plan without the user's go-ahead.
-7. If everything passed, suggest `/triad:review` as the next step.
+8. If everything passed, suggest `/triad:review` as the next step.

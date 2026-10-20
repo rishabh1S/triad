@@ -18,9 +18,20 @@ change state.
 
 1. Read the plan file you are given (normally `.triad/plan.md`): Goal, Steps, Acceptance
    criteria, Out of scope.
-2. Get the change: `git diff` and `git diff --staged`, plus `git status` for new untracked
-   files (read those in full). If the project is not a git repo, review the files the plan
-   names.
+2. Get the change. If `.triad/base` exists, its first line is `base: <commit>` and the
+   remaining lines list files that were already untracked before the task started:
+   - `git diff <commit>` is the full change for this task (staged and unstaged).
+   - New files are those from `git ls-files --others --exclude-standard` that are not
+     listed in `.triad/base`. Read them in full.
+   - Changes the user had before the task are in the baseline, so do not review them.
+
+   Without `.triad/base`, use `git diff HEAD` plus untracked files from
+   `git ls-files --others --exclude-standard`. If the project is not a git repo, review the
+   files the plan names.
+
+   Never read anything else under `.triad/` (build reports, earlier reviews, archives).
+   They contain the author's reasoning or old verdicts, and would break your
+   independence.
 3. Read surrounding code, not only the changed lines. Callers, interfaces and tests matter.
 4. Run the tests and build if the plan or repo shows how. Report real output.
 5. Check, in this order:

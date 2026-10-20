@@ -14,11 +14,12 @@ If the task above is empty, ask the user what they want planned and stop.
    relevant already established in this conversation (constraints, files the user
    mentioned). Wait for its result before continuing.
 2. Create the `.triad/` directory in the project root if it does not exist. If
-   `.triad/plan.md` already exists, move it to `.triad/archive/plan-<YYYYMMDD-HHMMSS>.md`
-   first.
-3. Save the planner's output, unchanged, to `.triad/plan.md`.
-4. If `.triad/` is not already ignored by git, tell the user they may want to add it to
-   `.gitignore` (do not edit `.gitignore` yourself).
+   `.triad/.gitignore` does not exist, create it containing the single line `*` so git
+   ignores the whole directory.
+3. If `.triad/plan.md` already exists, move `plan.md`, `build-report.md`, `review.md` and
+   `base` (whichever exist) into `.triad/archive/<YYYYMMDD-HHMMSS>/`, so nothing from the
+   previous task carries over.
+4. Save the planner's output, unchanged, to `.triad/plan.md`.
 5. Show the user a short summary: the goal, the numbered step titles, and the top risks.
    Then stop and ask them to approve, edit `.triad/plan.md` directly, or ask for changes.
 
