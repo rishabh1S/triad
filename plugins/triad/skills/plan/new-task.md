@@ -9,6 +9,6 @@ create it containing the single line `*` so git ignores the whole directory.
 
 ## Archive the previous task
 
-If `.triad/plan.md` already exists, move `plan.md`, `build-report.md`, `review.md`, `base`
-and `committed` (whichever exist) into `.triad/archive/<YYYYMMDD-HHMMSS>/`, so nothing from
+If `.triad/plan.md` already exists, move `plan.md`, `plan.approved.md`, `build-report.md`,
+`review.md`, `base` and `committed` (whichever exist) into `.triad/archive/<YYYYMMDD-HHMMSS>/`, so nothing from
 the previous task carries over. Leave `commit-mode` in place; it is a project setting.

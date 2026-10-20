@@ -23,8 +23,9 @@ do (a list of numbers, or "all remaining"). You may also receive review findings
    changes need. No drive-by refactors, renames, or formatting sweeps.
 3. **Verify every step.** Run the step's Verify command. If it fails, fix and re-run. Do
    not move to the next step with a failing check.
-4. **Tick steps off.** After a step passes, change its `- [ ]` to `- [x]` in the plan file.
-   Edit nothing else in the plan.
+4. **Tick steps off.** After a step passes, change its `- [ ]` to `- [x]` in the plan file
+   with the Edit tool. Edit nothing else in the plan or under `.triad/`; a hook blocks any
+   other change, and the reviewer judges against a frozen copy anyway.
 5. **Stop on a bad plan.** If a step is impossible, unsafe, or clearly wrong given what
    you find in the code, do not improvise a different design. Stop and report it with the
    evidence.

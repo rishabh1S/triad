@@ -51,7 +51,7 @@ Copied installs name the commands with a dash (`/triad-run`) instead of a colon 
 ```
 
 1. **Plan.** The Planner explores the code and shows you the goal, steps and risks.
-2. **Approve.** Say go, ask for changes, or edit `.triad/plan.md` yourself. Nothing is built before you agree.
+2. **Approve.** Say go, ask for changes, or edit `.triad/plan.md` yourself. Nothing is built before you agree, and building freezes the plan you approved.
 3. **Build.** The Implementer does each step and runs its check. If the plan turns out to be wrong, it stops and tells you instead of improvising.
 4. **Review.** The Reviewer replies **PASS** or **CHANGES_REQUESTED**.
 5. **Fix.** The Implementer fixes the findings, and the code is reviewed again. After two rounds triad stops and shows you what's left, because the plan may need rethinking.
@@ -114,7 +114,7 @@ Before building, triad notes what you'd already changed. The commit includes onl
 
 ## Under the hood
 
-- **Files, not memory.** Agents pass work through `.triad/` in your project: `plan.md`, `build-report.md`, `review.md`, a `base` snapshot taken before building, and `archive/` for earlier tasks. The folder ignores itself in git. The snapshot uses `git stash create`, which doesn't touch your files or your stash list.
+- **Files, not memory.** Agents pass work through `.triad/` in your project: `plan.md`, `plan.approved.md` (the frozen copy the reviewer judges against), `build-report.md`, `review.md`, a `base` snapshot taken before building, and `archive/` for earlier tasks. The folder ignores itself in git. The snapshot uses `git stash create`, which doesn't touch your files or your stash list.
 - **Read-only, enforced.** A `PreToolUse` hook stops the Planner and Reviewer from editing files or running commands that change state, such as redirects, `rm`, `sed -i`, git writes or package installs. It does nothing in other sessions. It's a guard, not a sandbox: a script that writes files from inside, such as a Python one-liner, gets through.
 - **Models.** The Planner and Reviewer use your session's model. The Implementer uses `sonnet` to keep costs down. For hard changes, set `model: inherit` in `implementer.md`.
 

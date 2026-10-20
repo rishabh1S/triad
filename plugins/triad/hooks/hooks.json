@@ -1,9 +1,9 @@
 {
-  "description": "Keep the triad planner and reviewer read-only, and keep the reviewer out of the implementer's notes",
+  "description": "Keep the triad planner and reviewer read-only, keep the reviewer out of the implementer's notes, and let the implementer only tick steps in the plan",
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Bash|Read|Grep|Glob|Edit|Write|NotebookEdit",
+        "matcher": "Bash|Read|Grep|Glob|Edit|MultiEdit|Write|NotebookEdit",
         "hooks": [
           {
             "type": "command",

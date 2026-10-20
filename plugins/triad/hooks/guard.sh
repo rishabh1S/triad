@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # PreToolUse hook. Plugin hooks fire for every tool call in every session, so bail out
-# cheaply unless the caller is the triad planner or reviewer.
+# cheaply unless the caller is a triad agent.
 
 input=$(cat)
-role_pattern='"agent_type"[[:space:]]*:[[:space:]]*"triad[:-](planner|reviewer)"'
+role_pattern='"agent_type"[[:space:]]*:[[:space:]]*"triad[:-](planner|reviewer|implementer)"'
 [[ $input =~ $role_pattern ]] || exit 0
 
 if ! command -v python3 >/dev/null 2>&1; then

@@ -19,5 +19,6 @@ If the task above is empty, ask the user what they want planned and stop.
 3. Save the planner's output, unchanged, to `.triad/plan.md`.
 4. Show the user a short summary: the goal, the numbered step titles, and the top risks.
    Then stop and ask them to approve, edit `.triad/plan.md` directly, or ask for changes.
+   Edits belong before building: the first build freezes the plan as approved.
 
 Do not implement anything in this command.

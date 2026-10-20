@@ -1,7 +1,15 @@
 # Triad: record the baseline
 
-Shared by `/triad:build` and `/triad:run`. The baseline lets the review and the commit
-cover only this task's changes.
+Shared by `/triad:build` and `/triad:run`. The baseline freezes the approved plan and lets
+the review and the commit cover only this task's changes.
+
+## Freeze the approved plan
+
+If `.triad/plan.approved.md` does not exist, copy `.triad/plan.md` to it. Never overwrite
+it. The reviewer judges the change against this copy, so later edits to `plan.md` cannot
+soften what was approved. Do this even when the project is not a git repo.
+
+## Record the git baseline
 
 Skip this if `.triad/base` already exists (never overwrite it), or if the project is not a
 git repo with at least one commit. Otherwise run from the project root:

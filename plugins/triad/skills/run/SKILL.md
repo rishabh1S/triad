@@ -22,7 +22,8 @@ for a subagent's result before starting the next phase.
 3. Show the user the goal, step titles and top risks.
 4. **Stop and wait for approval.** Continue only on an explicit go-ahead. If the user asks
    for changes, send the plan and their feedback back to `triad:planner`, save the
-   revision, and ask again. If they edited `.triad/plan.md` themselves, re-read it.
+   revision, and ask again. If they edited `.triad/plan.md` themselves, re-read it. Phase 2
+   freezes the plan, so changes must happen here.
 
 ## Phase 2 — Implement
 5. Read `${CLAUDE_SKILL_DIR}/../build/baseline.md` and follow it to record the baseline.
@@ -31,14 +32,16 @@ for a subagent's result before starting the next phase.
    and stop for the user's decision.
 
 ## Phase 3 — Review
-7. Delegate to `triad:reviewer` with only the plan path. Never pass it the implementer's
-   report or your own view of the code.
+7. Read `${CLAUDE_SKILL_DIR}/../review/approved-plan.md` and follow it. Then delegate to
+   `triad:reviewer` with only the plan path `.triad/plan.approved.md`. Never pass it the
+   implementer's report or your own view of the code.
 8. Save the result to `.triad/review.md`.
 
 ## Phase 4 — Fix loop (at most 2 rounds)
 9. If the verdict is PASS, go to Finish.
 10. If CHANGES_REQUESTED, send the Blocker and Major findings verbatim to
-    `triad:implementer`, then run a fresh review with `triad:reviewer` (plan path only).
+    `triad:implementer`, then follow `approved-plan.md` again and run a fresh review with
+    `triad:reviewer` (plan path `.triad/plan.approved.md` only).
 11. After 2 fix rounds without a PASS, stop and show the user the remaining findings.
     Do not keep looping; the plan itself may be wrong.
 
