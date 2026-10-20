@@ -1,4 +1,5 @@
 ---
+name: run
 description: Run the full triad loop — plan, your approval, implement, independent review, fix — for one task. Usage /triad:run <task>
 argument-hint: <what you want built or changed>
 disable-model-invocation: true

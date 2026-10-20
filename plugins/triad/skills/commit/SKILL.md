@@ -1,4 +1,5 @@
 ---
+name: commit
 description: Commit the current triad task, or set how triad commits after a passing review. Usage /triad:commit [manual|auto|off|commit message]
 argument-hint: '[manual | auto | off | commit message — empty: commit now]'
 disable-model-invocation: true

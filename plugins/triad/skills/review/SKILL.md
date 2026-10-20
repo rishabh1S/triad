@@ -1,4 +1,5 @@
 ---
+name: review
 description: Independently review the current changes against .triad/plan.md with the read-only triad reviewer agent. Usage /triad:review [extra focus]
 argument-hint: '[optional focus, e.g. "security" or "concurrency"]'
 disable-model-invocation: true

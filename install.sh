@@ -49,7 +49,7 @@ localize() {
   sed -E \
     -e 's/triad:(planner|implementer|reviewer|plan|build|review|run|commit)/triad-\1/g' \
     -e 's#\.\./(plan|build|review|run|commit)/#../triad-\1/#g' \
-    -e 's/^name: (planner|implementer|reviewer)$/name: triad-\1/' \
+    -e 's/^name: (planner|implementer|reviewer|plan|build|review|run|commit)$/name: triad-\1/' \
     "$1"
 }
 

@@ -1,4 +1,5 @@
 ---
+name: build
 description: Implement the approved plan in .triad/plan.md with the triad implementer agent. Usage /triad:build [step numbers, default all remaining]
 argument-hint: '[step numbers, e.g. "1 2" — default: all remaining]'
 disable-model-invocation: true

@@ -1,4 +1,5 @@
 ---
+name: plan
 description: Plan a task with the read-only triad planner agent and save it to .triad/plan.md for your approval. Usage /triad:plan <task>
 argument-hint: <what you want built or changed>
 disable-model-invocation: true
