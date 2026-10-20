@@ -39,6 +39,7 @@ fi
 if $uninstall; then
   for a in "${AGENTS[@]}"; do rm -f "$dest/agents/triad-$a.md"; done
   for s in "${SKILLS[@]}"; do rm -rf "$dest/skills/triad-$s"; done
+  rm -rf "$dest/hooks/triad"
   echo "Removed triad from $dest"
   exit 0
 fi
@@ -52,10 +53,34 @@ localize() {
     "$1"
 }
 
-mkdir -p "$dest/agents" "$dest/skills"
+# Plugins ship the guard in hooks/hooks.json. Copied agents are ordinary agents, which can
+# carry their own hooks, so add the guard to the read-only agents' frontmatter instead.
+add_guard_hook() {
+  local cmd="\"$dest/hooks/triad/guard.sh\""
+  awk -v cmd="${cmd//\'/\'\'}" '
+    /^---$/ && ++fences == 2 {
+      print "hooks:"
+      print "  PreToolUse:"
+      print "    - matcher: \"Bash|Read|Grep|Glob|Edit|Write|NotebookEdit\""
+      print "      hooks:"
+      print "        - type: command"
+      print "          command: '\''" cmd "'\''"
+    }
+    { print }
+  '
+}
+
+mkdir -p "$dest/agents" "$dest/skills" "$dest/hooks/triad"
+
+cp "$SRC/hooks/guard.sh" "$SRC/hooks/guard.py" "$SRC/hooks/bash_check.py" "$dest/hooks/triad/"
+chmod +x "$dest/hooks/triad/guard.sh"
 
 for a in "${AGENTS[@]}"; do
-  localize "$SRC/agents/$a.md" > "$dest/agents/triad-$a.md"
+  if [[ $a == implementer ]]; then
+    localize "$SRC/agents/$a.md" > "$dest/agents/triad-$a.md"
+  else
+    localize "$SRC/agents/$a.md" | add_guard_hook > "$dest/agents/triad-$a.md"
+  fi
 done
 
 for s in "${SKILLS[@]}"; do
