@@ -18,13 +18,24 @@ including a missing or empty file, means `manual`.
 
 ## Handle the argument
 
-- **`manual`, `auto` or `off`** (exactly one of these words): create `.triad/` if needed,
-  with a `.triad/.gitignore` containing `*` if it is missing. Write the word to
-  `.triad/commit-mode` (overwrite), tell the user the new mode in one line, and stop.
+- **`manual`, `auto` or `off`** (exactly one of these words): read
+  `${CLAUDE_SKILL_DIR}/../plan/new-task.md` and follow its "Set up `.triad/`" section.
+  Write the word to `.triad/commit-mode` (overwrite), tell the user the new mode in one
+  line, and stop.
 - **Empty**: run the commit procedure below now. Use auto if the mode is `auto`, manual
   otherwise. The user asked explicitly, so `off` does not block it.
 - **Anything else**: run the commit procedure below with that text as the commit message;
   skip the step that asks for or drafts one, but still show the files and wait for a yes.
+
+## After a PASS
+
+`/triad:review` and `/triad:run` follow this section when a review passes. Read the mode
+as described above.
+
+- `off`: tell the user nothing has been committed and that `/triad:commit` commits the
+  task whenever they want.
+- `manual` or `auto`: stop here and offer the commit by following the commit procedure
+  below in that mode.
 
 ## Commit procedure
 
