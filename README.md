@@ -7,8 +7,8 @@ Instead of one long session that plans, codes and then grades its own work, tria
 ```
            /triad:plan                 /triad:build                 /triad:review
  task ──► ┌──────────┐   you approve  ┌─────────────┐              ┌──────────┐
-          │ Planner  │ ─────────────► │ Implementer │ ───────────► │ Reviewer │ ──► PASS
-          │ read-only│  .triad/plan.md│ edits + runs│   git diff   │ read-only│
+          │ Planner  │ ─────────────► │ Implementer │ ───────────► │ Reviewer │ ──► PASS ──► commit?
+          │ read-only│  .triad/plan.md│ edits + runs│   git diff   │ read-only│     (you confirm)
           └──────────┘                └─────────────┘              └──────────┘
                                              ▲    CHANGES_REQUESTED     │
                                              └──── /triad:build fix ◄───┘
@@ -64,7 +64,9 @@ Local installs drop the plugin namespace, so commands become `/triad-plan`, `/tr
 | `/triad:build [steps]` | Implementer runs all unchecked steps, or only the numbers you pass. |
 | `/triad:review [focus]` | Reviewer checks the diff against the plan. Optional focus, e.g. `security`. |
 | `/triad:build fix` | Implementer fixes the Blocker and Major findings from the last review. |
-| `/triad:run <task>` | The whole loop: plan → your approval → build → review → up to 2 fix rounds. |
+| `/triad:run <task>` | The whole loop: plan → your approval → build → review → up to 2 fix rounds → commit offer. |
+| `/triad:commit [message]` | Commit the current task now, optionally with your own message. |
+| `/triad:commit manual\|auto\|off` | Choose what happens after a PASS (see below). |
 
 Example:
 
@@ -81,10 +83,24 @@ Everything the agents produce lands in `.triad/` in your project:
 ├── base               # git baseline recorded before the first build
 ├── build-report.md    # what the implementer did and what it verified
 ├── review.md          # the latest review
+├── committed          # SHA of the task's commit, once made
+├── commit-mode        # manual, auto or off (kept across tasks)
 └── archive/           # one folder per previous task
 ```
 
-`.triad/` ignores itself, so it never shows up in `git status` or in commits. Delete `.triad/.gitignore` if you want to commit these files. Nothing is ever committed or pushed for you.
+`.triad/` ignores itself, so it never shows up in `git status` or in commits. Delete `.triad/.gitignore` if you want to commit these files.
+
+### Committing
+
+When a review passes, triad stops and offers to commit the task. Pick how with `/triad:commit <mode>`:
+
+| Mode | After a PASS |
+|---|---|
+| `manual` (default) | Shows the files and asks you for the commit message. |
+| `auto` | Drafts the message from the diff and the plan, then waits for your yes, an edit, or cancel. |
+| `off` | Doesn't offer; run `/triad:commit` yourself whenever you like. |
+
+Only the task's own files are committed: triad uses the baseline to leave out changes you had before the task, and commits by path so anything else you had staged stays staged. It warns you when a task file also had your earlier uncommitted edits. Nothing is committed without your yes, hooks are never skipped, and nothing is ever pushed.
 
 Before the first build, triad records a baseline using `git stash create`, which does not change your working tree or stash list. The reviewer only judges changes made since then, so uncommitted work you already had is left out of the review. Starting a new plan moves all of the previous task's files into `archive/`.
 
@@ -117,7 +133,7 @@ After editing a plugin installed from a local folder, run `/reload-plugins` in y
 plugins/triad/
 ├── .claude-plugin/plugin.json      # plugin manifest
 ├── agents/                         # planner.md, implementer.md, reviewer.md
-└── skills/                         # plan/, build/, review/, run/  → /triad:<name>
+└── skills/                         # plan/, build/, review/, run/, commit/  → /triad:<name>
 install.sh                          # copy into a project's .claude/ without the plugin system
 ```
 

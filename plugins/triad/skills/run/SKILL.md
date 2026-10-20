@@ -17,8 +17,8 @@ for a subagent's result before starting the next phase.
 ## Phase 1 — Plan
 1. Delegate the task to `triad:planner`, with any relevant context from this conversation.
 2. Create `.triad/` if needed, with a `.triad/.gitignore` containing `*` if it is missing.
-   If `.triad/plan.md` exists, move `plan.md`, `build-report.md`, `review.md` and `base`
-   (whichever exist) into `.triad/archive/<YYYYMMDD-HHMMSS>/`. Save the new plan to
+   If `.triad/plan.md` exists, move `plan.md`, `build-report.md`, `review.md`, `base`
+   and `committed` (whichever exist) into `.triad/archive/<YYYYMMDD-HHMMSS>/`. Save the new plan to
    `.triad/plan.md`.
 3. Show the user the goal, step titles and top risks.
 4. **Stop and wait for approval.** Continue only on an explicit go-ahead. If the user asks
@@ -51,5 +51,11 @@ for a subagent's result before starting the next phase.
 
 ## Finish
 12. Give the user a short summary: what was built, files changed, the final verdict, any
-    remaining Minor findings, and the checks that ran. Remind them nothing has been
-    committed.
+    remaining Minor findings, and the checks that ran.
+13. If the final verdict is PASS, read `.triad/commit-mode` (missing means `manual`).
+    - `off`: remind the user nothing has been committed and that `/triad:commit`
+      commits the task whenever they want.
+    - `manual` or `auto`: stop here and offer the commit. Read
+      `${CLAUDE_SKILL_DIR}/../commit/SKILL.md` and follow its "Commit procedure" section
+      in that mode.
+    If the loop ended without a PASS, remind them nothing has been committed.

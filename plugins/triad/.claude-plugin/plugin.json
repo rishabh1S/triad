@@ -1,7 +1,7 @@
 {
   "name": "triad",
-  "version": "0.1.1",
-  "description": "Planner → Implementer → Reviewer multi-agent workflow for Claude Code. Commands: /triad:plan, /triad:build, /triad:review, /triad:run.",
+  "version": "0.2.0",
+  "description": "Planner → Implementer → Reviewer multi-agent workflow for Claude Code. Commands: /triad:plan, /triad:build, /triad:review, /triad:run, /triad:commit.",
   "author": {
     "name": "Rishabh Singh"
   },

@@ -16,8 +16,8 @@ If the task above is empty, ask the user what they want planned and stop.
 2. Create the `.triad/` directory in the project root if it does not exist. If
    `.triad/.gitignore` does not exist, create it containing the single line `*` so git
    ignores the whole directory.
-3. If `.triad/plan.md` already exists, move `plan.md`, `build-report.md`, `review.md` and
-   `base` (whichever exist) into `.triad/archive/<YYYYMMDD-HHMMSS>/`, so nothing from the
+3. If `.triad/plan.md` already exists, move `plan.md`, `build-report.md`, `review.md`,
+   `base` and `committed` (whichever exist) into `.triad/archive/<YYYYMMDD-HHMMSS>/`, so nothing from the
    previous task carries over.
 4. Save the planner's output, unchanged, to `.triad/plan.md`.
 5. Show the user a short summary: the goal, the numbered step titles, and the top risks.

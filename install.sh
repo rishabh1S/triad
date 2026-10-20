@@ -8,14 +8,15 @@
 #   ./install.sh --uninstall [dir|--user]
 #
 # Local installs drop the plugin namespace, so commands become /triad-plan,
-# /triad-build, /triad-review, /triad-run and agents become triad-planner, etc.
+# /triad-build, /triad-review, /triad-run, /triad-commit and agents become
+# triad-planner, etc.
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SRC="$SCRIPT_DIR/plugins/triad"
 AGENTS=(planner implementer reviewer)
-SKILLS=(plan build review run)
+SKILLS=(plan build review run commit)
 
 uninstall=false
 target=""
@@ -23,7 +24,7 @@ for arg in "$@"; do
   case "$arg" in
     --uninstall) uninstall=true ;;
     --user) target="$HOME" ;;
-    -h|--help) sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) target="$arg" ;;
   esac
 done
@@ -45,7 +46,8 @@ fi
 # Rewrite plugin-scoped names (triad:planner, /triad:plan) to local ones (triad-planner, /triad-plan).
 localize() {
   sed -E \
-    -e 's/triad:(planner|implementer|reviewer|plan|build|review|run)/triad-\1/g' \
+    -e 's/triad:(planner|implementer|reviewer|plan|build|review|run|commit)/triad-\1/g' \
+    -e 's#\.\./(plan|build|review|run|commit)/#../triad-\1/#g' \
     -e 's/^name: (planner|implementer|reviewer)$/name: triad-\1/' \
     "$1"
 }
@@ -63,5 +65,5 @@ done
 
 echo "Installed triad into $dest"
 echo "  agents:   triad-planner, triad-implementer, triad-reviewer"
-echo "  commands: /triad-plan, /triad-build, /triad-review, /triad-run"
+echo "  commands: /triad-plan, /triad-build, /triad-review, /triad-run, /triad-commit"
 echo "Restart Claude Code if this is the first agent or skill in that folder."
