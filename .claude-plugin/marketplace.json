@@ -1,0 +1,14 @@
+{
+  "name": "triad-agents",
+  "description": "Multi-agent workflows for Claude Code",
+  "owner": {
+    "name": "Rishabh Singh"
+  },
+  "plugins": [
+    {
+      "name": "triad",
+      "source": "./plugins/triad",
+      "description": "Planner → Implementer → Reviewer workflow: plan with a read-only agent, build with an implementer, review with an independent reviewer."
+    }
+  ]
+}

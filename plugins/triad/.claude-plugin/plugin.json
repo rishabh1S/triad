@@ -1,0 +1,10 @@
+{
+  "name": "triad",
+  "version": "0.1.0",
+  "description": "Planner → Implementer → Reviewer multi-agent workflow for Claude Code. Commands: /triad:plan, /triad:build, /triad:review, /triad:run.",
+  "author": {
+    "name": "Rishabh Singh"
+  },
+  "license": "MIT",
+  "keywords": ["subagents", "orchestration", "planning", "code-review", "workflow"]
+}
