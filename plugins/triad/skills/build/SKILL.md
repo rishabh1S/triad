@@ -17,21 +17,7 @@ latest review)
    - step numbers: run those steps.
    - empty: run every step still marked `- [ ]`. If none remain, say so and suggest
      `/triad:review`.
-3. If `.triad/base` does not exist and the project is a git repo with at least one commit,
-   record the baseline so the review covers only this task's changes. Run from the project
-   root:
-   ```bash
-   base=$(git stash create); base=${base:-$(git rev-parse HEAD)}
-   { echo "base: $base"
-     git ls-files --others --exclude-standard | while IFS= read -r f; do
-       printf '%s\t%s\n' "$(git hash-object -w -- "$f")" "$f"
-     done
-   } > .triad/base
-   ```
-   `git stash create` and `git hash-object -w` only write objects into git's store; they
-   do not touch the working tree, the index or the stash list. The blob hashes let the
-   review and commit spot untracked files the task later changes. Never overwrite an
-   existing `.triad/base`.
+3. Read `${CLAUDE_SKILL_DIR}/baseline.md` and follow it to record the baseline.
 4. Delegate to the `triad:implementer` subagent with: the plan path `.triad/plan.md`, the
    exact step numbers or the exact findings to fix (copied verbatim), and any user
    instructions from this conversation since the plan was approved. Wait for its report

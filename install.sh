@@ -60,7 +60,9 @@ done
 
 for s in "${SKILLS[@]}"; do
   mkdir -p "$dest/skills/triad-$s"
-  localize "$SRC/skills/$s/SKILL.md" > "$dest/skills/triad-$s/SKILL.md"
+  for f in "$SRC/skills/$s"/*.md; do
+    localize "$f" > "$dest/skills/triad-$s/$(basename "$f")"
+  done
 done
 
 echo "Installed triad into $dest"
