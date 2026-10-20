@@ -1,5 +1,7 @@
 # triad
 
+[![CI](https://github.com/rishabh1S/triad/actions/workflows/ci.yml/badge.svg)](https://github.com/rishabh1S/triad/actions/workflows/ci.yml)
+
 **Plan it, build it, check it, commit it, with three focused AI agents instead of one.**
 
 triad is a [Claude Code](https://code.claude.com/docs/en/overview) plugin that splits a coding task between a **Planner**, an **Implementer** and a **Reviewer**. Your main session coordinates them, and you approve the decisions that matter.
