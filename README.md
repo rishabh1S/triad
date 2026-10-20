@@ -1,6 +1,9 @@
+<img src="plugins/triad/.claude-plugin/icon.png" alt="triad icon" width="96" align="left">
+
 # triad
 
 [![CI](https://github.com/rishabh1S/triad/actions/workflows/ci.yml/badge.svg)](https://github.com/rishabh1S/triad/actions/workflows/ci.yml)
+<br clear="left">
 
 **Plan it, build it, check it, commit it, with three focused AI agents instead of one.**
 
