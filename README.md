@@ -173,7 +173,7 @@ triad is careful about what goes into the commit:
 
 - **Only this task's files.** Before building, triad notes which changes you already had, and leaves those out of the commit.
 - **Your staged work stays put.** Anything else you had staged stays staged and is not included.
-- **A warning when files overlap.** If a file had your own uncommitted edits before the task and triad also changed it, you're told that the whole file will be committed.
+- **A warning when files overlap.** If a file had your own uncommitted edits before the task, or was an untracked file you already had, and triad also changed it, you're told that the whole file will be committed. Those changes are still reviewed.
 - **No shortcuts.** Git hooks always run, nothing is amended, and nothing is ever pushed.
 
 ## Where things are saved

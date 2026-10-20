@@ -38,10 +38,16 @@ the project root.
      continue if they confirm.
 2. **Collect this task's files and nothing else.**
    - If `.triad/base` exists, read the commit from its `base: <sha>` line; the remaining
-     lines are files that were untracked before the task.
+     lines are `<blob>\t<path>` (or just `<path>` in older baselines) for files that were
+     untracked before the task.
      - Changed or deleted: `git diff --name-only <sha>`
      - New: `git ls-files --others --exclude-standard`, minus the files listed in
        `.triad/base`
+     - Changed by the task although untracked before it: listed files whose
+       `git hash-object -- <path>` differs from their blob. Treat them as new files;
+       they will be committed whole, including the user's content from before the task,
+       so list them as a warning. Listed files that no longer exist were never tracked,
+       so there is nothing to commit for them; mention them.
      - Already dirty before the task: `git diff --name-only HEAD <sha>`. Any of these
        that also appear in the task's files will be committed whole, including the
        user's earlier edits; list them as a warning.
