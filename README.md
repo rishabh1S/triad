@@ -1,11 +1,18 @@
-<img src="plugins/triad/.claude-plugin/icon.png" alt="triad icon" width="96" align="left">
+<p align="center">
+  <img src="plugins/triad/.claude-plugin/icon.png" alt="triad icon" width="140">
+</p>
 
-# triad
+<h1 align="center">triad</h1>
 
-[![CI](https://github.com/rishabh1S/triad/actions/workflows/ci.yml/badge.svg)](https://github.com/rishabh1S/triad/actions/workflows/ci.yml)
-<br clear="left">
+<p align="center">
+  <strong>Plan it, build it, check it, commit it, with three focused AI agents instead of one.</strong>
+</p>
 
-**Plan it, build it, check it, commit it, with three focused AI agents instead of one.**
+<p align="center">
+  <a href="https://github.com/rishabh1S/triad/actions/workflows/ci.yml"><img src="https://github.com/rishabh1S/triad/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/rishabh1S/triad/releases/latest"><img src="https://img.shields.io/github/v/release/rishabh1S/triad" alt="Latest release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/rishabh1S/triad" alt="MIT license"></a>
+</p>
 
 triad is a [Claude Code](https://code.claude.com/docs/en/overview) plugin that splits a coding task between a **Planner**, an **Implementer** and a **Reviewer**. Your main session coordinates them, and you approve the decisions that matter.
 
