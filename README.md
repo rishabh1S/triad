@@ -75,6 +75,8 @@ Copied installs name the commands with a dash (`/triad-run`) instead of a colon 
 ```markdown
 # Plan: Rate-limit /api/orders
 
+[![HOL Guard](https://img.shields.io/endpoint?url=https%3A%2F%2Fhol.org%2Fapi%2Fregistry%2Fbadges%2Fplugin%3Fslug%3Drishabh1s%252Ftriad%26metric%3Dtrust)](https://hol.org/registry/plugins/rishabh1s%2Ftriad)
+
 ## Goal
 Requests to /api/orders beyond 100 per minute per API key get a 429 response.
 
